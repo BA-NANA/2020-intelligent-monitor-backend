@@ -25,6 +25,18 @@ CREATE TABLE staff(
   	create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*部门表*/
+CREATE TABLE department(
+		dept_id SMALLINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT'部门编号',
+		dept_name VARCHAR(12) NOT NULL UNIQUE KEY COMMENT'部门名称',
+		dept_phone VARCHAR(20) NOT NULL COMMENT'部门电话',
+		dept_leader VARCHAR(15) NOT NULL COMMENT'负责人',
+		leader_phone VARCHAR(20) NOT NULL COMMENT'负责人电话',
+		dept_remark VARCHAR(100) COMMENT'备注',
+  	update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  	create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 /*测量表*/
 CREATE TABLE monitor_plan(
 		id SMALLINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT'监测方案编号',
@@ -35,6 +47,19 @@ CREATE TABLE monitor_plan(
 		max_value DECIMAL(5,2) COMMENT'上限值',
 		monitor_unit VARCHAR(10) COMMENT '测量单位',
 		monitor_frequency VARCHAR(10) NOT NULL COMMENT'监测频率'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备表*/
+CREATE TABLE device(
+		device_id SMALLINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT'设备编号',
+		device_code VARCHAR(12) COMMENT'设备编码',
+		device_name VARCHAR(12) NOT NULL COMMENT'设备名称',
+		device_size VARCHAR(12) COMMENT'型号规格',
+		device_category VARCHAR(12) COMMENT'类别',
+		item VARCHAR(12) COMMENT'适用项目',
+		check_frequency VARCHAR(12) COMMENT'检验周期',
+		device_producer VARCHAR(30) NOT NULL COMMENT'生产商',
+		create_time VARCHAR(15) NOT NULL COMMENT'生产日期'
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*模拟检测数据表*/
@@ -84,6 +109,28 @@ CREATE TABLE real_time_data(
 		monitor_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT'监测时间'
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*清运表*/
+CREATE TABLE clearance(
+		cle_id SMALLINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT'清运单位编号',
+		cle_name VARCHAR(50) NOT NULL UNIQUE KEY COMMENT'清运单位名称',
+		cle_leader VARCHAR(15) COMMENT'负责人',
+		leader_phone VARCHAR(20) COMMENT'负责人电话',
+		cle_place VARCHAR(50) COMMENT'地址',
+		cle_remark VARCHAR(100) COMMENT'备注',
+  	update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  	create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*维修记录表*/
+CREATE TABLE maintenance(
+		maint_id SMALLINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT'检修编号',
+		maint_name VARCHAR(50) NOT NULL COMMENT'设备名称',
+		use_time VARCHAR(15) NOT NULL COMMENT'使用时间',
+		maint_time VARCHAR(15) COMMENT'检修日期', 
+		maint_status VARCHAR(50) NOT NULL COMMENT'检查状态',
+		report_status VARCHAR(50) NOT NULL COMMENT'报备情况',
+		maint_person VARCHAR(15) NOT NULL COMMENT'检修人'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ~~~
 
 监测方案如下图所示
@@ -546,4 +593,430 @@ CREATE TABLE real_time_data(
     }
 }
 ```
+
+### 4.设备
+
+##### 4.0 新增一个设备
+
+[POST] / device / add
+
+参数
+
+| 参数名称   | 是否必须 | 说明     |
+| ---------- | -------- | -------- |
+| code       | N        | 设备编码 |
+| name       | Y        | 设备名称 |
+| size       | N        | 设备规格 |
+| category   | N        | 手机号   |
+| item       | N        | 适用项目 |
+| frequency  | N        | 职位     |
+| producer   | Y        | 生产商   |
+| creat_time | N        | 生产日期 |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 4.1 通过设备ID删除
+
+[POST] / device / delete
+
+参数
+
+| 参数名称 | 是否必须 | 说明     |
+| -------- | -------- | -------- |
+| id       | Y        | 员工编号 |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 4.2 更新设备信息
+
+[POST] / device / update
+
+参数
+
+| 参数名称   | 是否必须 | 说明     |
+| ---------- | -------- | -------- |
+| code       | N        | 设备编码 |
+| name       | Y        | 设备名称 |
+| size       | N        | 设备规格 |
+| category   | N        | 类别     |
+| item       | N        | 适用项目 |
+| frequency  | N        | 检验周期 |
+| producer   | Y        | 生产商   |
+| creat_time | N        | 生产日期 |
+| id         | Y        | 设备ID   |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 4.3 查询所有设备信息
+
+[GET] / device / getAll
+
+参数
+
+| 参数名称 | 是否必须 | 说明           |
+| -------- | -------- | -------------- |
+| pageNum  | Y        | 当前页数 0开始 |
+| pageSize | Y        | 一页显示多少条 |
+
+返回
+
+~~~Json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "total_num": 4,
+        "device_list": [
+            {
+                "device_id": 2,
+                "device_code": "ICT24G",
+                "device_name": "机车",
+                "device_size": "20*20",
+                "device_category": "类别1",
+                "device_item": "项目1",
+                "check_frequency": "1周/次",
+                "device_producer": "一汽重工",
+                "create_time": "2020-05-19 12:27:00"
+            }
+        ]
+    }
+}
+~~~
+
+### 5.部门
+
+##### 5.0 新增一个部门
+
+[POST] / department / add
+
+参数
+
+| 参数名称     | 是否必须 | 说明     |
+| ------------ | -------- | -------- |
+| name         | Y        | 部门名   |
+| dept_phone   | Y        | 部门电话 |
+| leader       | Y        | 部门主管 |
+| leader_phone | Y        | 主管电话 |
+| remark       | N        | 备注     |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 5.1 通过部门ID删除
+
+[POST] / department / delete
+
+参数
+
+| 参数名称 | 是否必须 | 说明     |
+| -------- | -------- | -------- |
+| id       | Y        | 部门编号 |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 
+
+##### 5.2 通过部门ID更新
+
+[POST] / department / update
+
+参数
+
+| 参数名称     | 是否必须 | 说明     |
+| ------------ | -------- | -------- |
+| name         | Y        | 部门名   |
+| dept_phone   | Y        | 部门电话 |
+| leader       | Y        | 部门主管 |
+| leader_phone | Y        | 主管电话 |
+| remark       | N        | 备注     |
+| id           | Y        | 部门编号 |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 5.3 查询所有部门信息
+
+[GET] / device / getAll
+
+参数
+
+| 参数名称 | 是否必须 | 说明           |
+| -------- | -------- | -------------- |
+| pageNum  | Y        | 当前页数 0开始 |
+| pageSize | Y        | 一页显示多少条 |
+
+返回
+
+~~~json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "total_num": 1,
+        "device_list": [
+            {
+                "dept_id": 2,
+                "dept_name": "纪律部",
+                "dept_phone": "13800138000",
+                "dept_leader": "张同学",
+                "leader_phone": "13800138001",
+                "dept_remark": "666",
+                "update_time": "2020-05-19 13:37:09",
+                "create_time": "2020-05-19 13:36:47"
+            }
+        ]
+    }
+}
+~~~
+
+### 6.清算
+
+##### 6.0 新增一条清算记录
+
+[POST] / clearance / add
+
+参数
+
+| 参数名称 | 是否必须 | 说明         |
+| -------- | -------- | ------------ |
+| name     | Y        | 清运单位名称 |
+| leader   | N        | 部门电话     |
+| phone    | N        | 部门主管     |
+| place    | N        | 地址         |
+| remark   | N        | 适用项目     |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 6.1 通过清算ID删除
+
+[POST] / clearance / delete
+
+参数
+
+| 参数名称 | 是否必须 | 说明     |
+| -------- | -------- | -------- |
+| id       | Y        | 部门编号 |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 
+
+##### 6.2 通过清算ID更新
+
+[POST] / clearance / update
+
+参数
+
+| 参数名称 | 是否必须 | 说明         |
+| -------- | -------- | ------------ |
+| name     | Y        | 清运单位名称 |
+| leader   | N        | 负责人       |
+| phone    | N        | 负责人电话   |
+| place    | N        | 地址         |
+| remark   | N        | 备注         |
+| id       | Y        | 清算编号     |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 6.3 查询所有清算信息
+
+[GET] / clearance / getAll
+
+参数
+
+| 参数名称 | 是否必须 | 说明           |
+| -------- | -------- | -------------- |
+| pageNum  | Y        | 当前页数 0开始 |
+| pageSize | Y        | 一页显示多少条 |
+
+返回
+
+~~~json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "total_num": 1,
+        "clearance_list": [
+            {
+                "cle_id": 4,
+                "cle_name": "清算名2",
+                "cle_leader": "负责人2",
+                "leader_phone": "13800138000",
+                "cle_place": "地址",
+                "cle_remark": "备注",
+                "update_time": "2020-05-19 14:18:36",
+                "create_time": "2020-05-19 14:17:48"
+            }
+        ]
+    }
+}
+~~~
+
+### 7.检修
+
+##### 7.0 新增一条检修记录
+
+[POST] / maintenance / add
+
+参数
+
+| 参数名称      | 是否必须 | 说明             |
+| ------------- | -------- | ---------------- |
+| name          | Y        | 检修设备名       |
+| use_time      | Y        | 使用时间(String) |
+| maint_time    | Y        | 检修时间(Date)   |
+| maint_status  | Y        | 检修状态         |
+| report_status | Y        | 报备状态         |
+| person        | Y        | 检修人           |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 7.1 通过检修ID删除
+
+[POST] / maintenance / delete
+
+参数
+
+| 参数名称 | 是否必须 | 说明     |
+| -------- | -------- | -------- |
+| id       | Y        | 部门编号 |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 
+
+##### 7.2 通过检修ID更新
+
+[POST] / maintenance / update
+
+参数
+
+| 参数名称      | 是否必须 | 说明             |
+| ------------- | -------- | ---------------- |
+| name          | Y        | 检修设备名       |
+| user_time     | Y        | 使用时间(String) |
+| maint_time    | Y        | 检修时间(Date)   |
+| maint_status  | Y        | 检修状态         |
+| report_status | Y        | 报备状态         |
+| person        | Y        | 检修人           |
+| id            | Y        | 检修ID           |
+
+返回
+
+```json
+{
+	"code":0,
+	"msg":"success"
+}
+```
+
+##### 7.3 查询所有检修记录
+
+[GET] / maintenance / getAll
+
+参数
+
+| 参数名称 | 是否必须 | 说明           |
+| -------- | -------- | -------------- |
+| pageNum  | Y        | 当前页数 0开始 |
+| pageSize | Y        | 一页显示多少条 |
+
+返回
+
+~~~json
+{
+    "code": 0,
+    "msg": "success",
+    "data": {
+        "total_num": 1,
+        "clearance_list": [
+            {
+                "maint_id": 3,
+                "maint_name": "检修记录1",
+                "user_time": "55小时",
+                "maint_time": "2019-05-30 00:00:00",
+                "maint_status": "报废",
+                "report_status": "等待上报",
+                "maint_person": "小李"
+            }
+        ]
+    }
+}
+~~~
 

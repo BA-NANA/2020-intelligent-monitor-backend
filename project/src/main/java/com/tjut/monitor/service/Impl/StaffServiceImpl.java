@@ -44,6 +44,7 @@ public class StaffServiceImpl implements StaffService {
         staffTemp.setAge(staff.getAge());
         staffTemp.setPhone(staff.getPhone());
         staffTemp.setDepartment(staff.getDepartment());
+        staffTemp.setSex(staff.getSex());
         staffTemp.setPosition(staff.getPosition());
         repository.save(staffTemp);
         log.info("【修改员工信息成功】员工编号：{}",staffTemp.getStaffId());
